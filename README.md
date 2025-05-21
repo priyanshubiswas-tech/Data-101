@@ -10,7 +10,7 @@ This document outlines the **complete data engineering lifecycle**, from raw dat
 ## Structure
 
 
-# End-to-End Data Pipeline Architecture 
+### End-to-End Data Pipeline Architecture 
 
 ---
 
