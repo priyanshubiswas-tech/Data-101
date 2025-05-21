@@ -20,4 +20,12 @@
 
 #### 📥 Common DML Commands:
 - `SELECT` – retrieves data.
-- `INSERT` – adds
+- `INSERT` – adds new records.
+- `UPDATE` – modifies existing records.
+- `DELETE` – removes records.
+
+| Feature        | DDL                        | DML                        |
+|----------------|-----------------------------|-----------------------------|
+| Affects        | Schema/Structure            | Table Data                 |
+| Transactions   | Auto-commits                | Can be rolled back         |
+| Purpose        | Define/modify DB objects    | Manipulate data            |
