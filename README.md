@@ -1,7 +1,7 @@
 # Data-Engineering-101
 
 
-# Data Engineering Process Overview 🛠️
+### Data Engineering Process Overview 
 
 This document outlines the **complete data engineering lifecycle**, from raw data collection to analytics and governance.
 
@@ -10,7 +10,7 @@ This document outlines the **complete data engineering lifecycle**, from raw dat
 ## Structure
 
 
-# End-to-End Data Pipeline Architecture 🏗️ 
+# End-to-End Data Pipeline Architecture 
 
 ---
 
