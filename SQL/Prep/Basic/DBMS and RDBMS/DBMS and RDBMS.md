@@ -1,24 +1,29 @@
-✅ Concept: DBMS vs RDBMS
-DBMS (Database Management System):
-A software for storing and managing data.
+📘 Short Notes: DBMS vs RDBMS
+🔹 DBMS (Database Management System)
+Software to manage data.
 
-Data can be stored in any format (hierarchical, network, etc.).
+Stores data in various formats (files, hierarchical, network).
 
-No strict relationship between data.
+No strong enforcement of relationships or constraints.
 
-Examples: Microsoft Access, file systems.
+No table-based structure.
 
-RDBMS (Relational Database Management System):
-A type of DBMS based on the relational model (tables with rows and columns).
+Example: File System, XML DB, Microsoft Access.
 
-Tables can be linked using foreign keys.
+🔹 RDBMS (Relational Database Management System)
+A type of DBMS based on a relational model (tables).
 
-Enforces data integrity using constraints.
+Data is stored in rows and columns.
 
-Examples: MySQL, PostgreSQL, Oracle, SQL Server.
+Supports primary keys, foreign keys, and constraints.
+
+Ensures data integrity and uses SQL.
+
+Example: MySQL, PostgreSQL, Oracle, SQL Server.
 
 Feature	DBMS	RDBMS
-Data format	File-based, semi-structured	Tabular (rows and columns)
-Relationships	No	Yes (using primary & foreign keys)
-Data Integrity	Less focus	Strong constraints
-Normalization	Rarely used	Common
+Structure	Any format	Table-based
+Relationships	Not enforced	Enforced via foreign keys
+Constraints	Minimal	Strong (PK, FK, etc.)
+Data Integrity	Low	High
+Normalization	Not supported	Supported
