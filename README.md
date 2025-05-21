@@ -7,7 +7,7 @@ This document outlines the **complete data engineering lifecycle**, from raw dat
 
 ---
 
-## 📊 Step-by-Step Flow
+## Structure
 
 ```text
 1️⃣ DATA SOURCES
