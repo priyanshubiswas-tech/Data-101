@@ -45,8 +45,8 @@ This document outlines the **complete data engineering lifecycle**, from raw dat
 4️⃣ DATA PROCESSING
    ↓
    Types:
-   - **Batch**: Periodic large jobs (daily/hourly)
-   - **Real-time/Streaming**: Continuous data flows
+   - Batch: Periodic large jobs (daily/hourly)
+   - Real-time/Streaming: Continuous data flows
 
    Tools:
    - PySpark / Spark
