@@ -198,4 +198,4 @@ spark-submit \
 - Low-latency apps → Use Presto or Druid
 - Real-time apps → Use Spark + Kafka carefully
 
----
+
