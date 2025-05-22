@@ -1,54 +1,38 @@
-# 🚀 End-to-End Project: Spark SQL + DBT for Data Transformation
-
-## 🧠 Use Case: Sales Analytics
-
-We have a **raw orders dataset**, and we want to:
-- Clean and transform the data
-- Create monthly revenue reports per customer
-- Build an incremental pipeline for efficiency
+# 🚀 Spark SQL + DBT End-to-End Pipeline (With Step-by-Step Links)
 
 ---
 
-## 📂 Project Directory Structure
+## 🧠 Use Case: Sales Analytics Pipeline
+
+Goal:
+- Read raw orders data
+- Clean & transform using DBT on Spark SQL
+- Aggregate customer revenue monthly
+- Output a reliable, scalable dataset
+
+---
+
+## 📂 Project Structure
 
 ```
 dbt-spark-sales/
 ├── models/
 │   ├── staging/
-│   │   └── stg_orders.sql
+│   │   └── stg_orders.sql         # Clean raw data
 │   ├── marts/
-│   │   └── customer_monthly_sales.sql
+│   │   └── customer_monthly_sales.sql # Aggregate data
 ├── seeds/
-│   └── customers.csv
-├── dbt_project.yml
-├── profiles.yml
-└── README.md
+│   └── customers.csv              # Static dimension data
+├── models/schema.yml             # Source + test definitions
+├── dbt_project.yml               # DBT project settings
+├── profiles.yml                  # Connection to Spark
 ```
 
 ---
 
-## 🏗️ Step-by-Step Pipeline Overview
-
-```
-📁 Raw Data (Parquet/CSV/Hive)
-     ⬇️
-🧼 Stage: Clean data (dbt model)
-     ⬇️
-📊 Mart: Aggregate customer monthly sales
-     ⬇️
-✅ Test: Validate the output
-     ⬇️
-📦 Materialized as Tables in Spark
-```
-
----
-
-## 1️⃣ Project Setup
-
-### 📄 `profiles.yml`
+## 1️⃣ `profiles.yml` → **Connection to Spark**
 
 ```yaml
-# ~/.dbt/profiles.yml
 spark:
   target: dev
   outputs:
@@ -58,14 +42,17 @@ spark:
       host: localhost
       port: 10001
       schema: analytics
-      threads: 2
 ```
 
-### 📄 `dbt_project.yml`
+✅ **Why Needed**:  
+This tells DBT how to connect to your **Spark environment**. All subsequent `dbt run`, `test`, and `seed` commands use this configuration.
+
+---
+
+## 2️⃣ `dbt_project.yml` → **Project Configuration**
 
 ```yaml
 name: 'dbt_spark_sales'
-version: '1.0'
 profile: 'spark'
 
 model-paths: ["models"]
@@ -79,11 +66,36 @@ models:
       materialized: table
 ```
 
+✅ **Why Needed**:  
+This sets up the **folder structure and model behavior**. It links to `profiles.yml` and ensures DBT knows where to look for SQL models.
+
 ---
 
-## 2️⃣ Stage Model: Clean Orders Data
+## 3️⃣ `models/schema.yml` → **Sources + Tests**
 
-📄 `models/staging/stg_orders.sql`
+```yaml
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: orders
+
+models:
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+```
+
+✅ **Why Needed**:  
+Defines where **raw data comes from** (e.g., Hive table `raw.orders`) and sets up **tests** on your models. This connects your SQL to real upstream data.
+
+---
+
+## 4️⃣ `models/staging/stg_orders.sql` → **Data Cleaning Layer**
 
 ```sql
 WITH renamed AS (
@@ -99,11 +111,13 @@ FROM renamed
 WHERE order_date IS NOT NULL
 ```
 
+✅ **Why Needed**:  
+Pulls from the raw table and performs basic cleaning.  
+🔁 **Feeds into**: the next model (`customer_monthly_sales.sql`) using `{{ ref('stg_orders') }}`.
+
 ---
 
-## 3️⃣ Mart Model: Monthly Revenue per Customer
-
-📄 `models/marts/customer_monthly_sales.sql`
+## 5️⃣ `models/marts/customer_monthly_sales.sql` → **Aggregated Report Layer**
 
 ```sql
 {{ config(materialized='incremental', unique_key='customer_month') }}
@@ -127,11 +141,13 @@ SELECT
 FROM monthly_sales
 ```
 
+✅ **Why Needed**:  
+Takes **cleaned data from staging layer**, performs aggregation, and materializes a **monthly sales report**.  
+Uses **incremental logic** to scale for large datasets.
+
 ---
 
-## 4️⃣ Seeds: Static Data Load
-
-📄 `seeds/customers.csv`
+## 6️⃣ `seeds/customers.csv` → **Static Dimension Table**
 
 ```csv
 customer_id,customer_name
@@ -141,88 +157,85 @@ customer_id,customer_name
 ```
 
 ```bash
-dbt seed  # Loads static CSV into Spark
+dbt seed
 ```
+
+✅ **Why Needed**:  
+Loads static CSV data as a Spark table.  
+Can be joined with your sales mart later for reporting or enrichment.
 
 ---
 
-## 5️⃣ Sources: Link Raw Data
-
-📄 `models/schema.yml`
-
-```yaml
-version: 2
-
-sources:
-  - name: raw
-    tables:
-      - name: orders
-
-models:
-  - name: stg_orders
-    description: "Cleaned order data"
-    columns:
-      - name: order_id
-        tests:
-          - not_null
-          - unique
-  - name: customer_monthly_sales
-    description: "Monthly sales per customer"
-    columns:
-      - name: total_sales
-        tests:
-          - not_null
-```
-
----
-
-## 6️⃣ Run the Pipeline
+## 7️⃣ `dbt run` → **Runs the Pipeline**
 
 ```bash
-dbt run           # Compiles and runs transformations on Spark SQL
-dbt test          # Runs data quality checks
-dbt docs generate # Generates documentation site
-dbt docs serve    # Serves interactive docs locally
+dbt run
+```
+
+✅ **Why Needed**:  
+- Compiles all models
+- Executes them in dependency order
+- Applies materialization logic (table, view, incremental)
+
+---
+
+## 8️⃣ `dbt test` → **Validates Your Data**
+
+```bash
+dbt test
+```
+
+✅ **Why Needed**:  
+- Ensures model data is accurate and clean
+- Enforces constraints like `not_null`, `unique`
+
+---
+
+## 9️⃣ `dbt docs generate` → **Auto Documentation**
+
+```bash
+dbt docs generate
+dbt docs serve
+```
+
+✅ **Why Needed**:  
+- Generates a browsable site of your data model
+- Helps new team members or analysts understand your transformations
+
+---
+
+## 🔄 Flow Summary Diagram
+
+```
+RAW ORDERS TABLE (Hive / Spark Table)
+        ↓
+schema.yml --> Source definition: {{ source('raw', 'orders') }}
+        ↓
+stg_orders.sql --> Clean and filter data
+        ↓
+customer_monthly_sales.sql --> Aggregation logic (monthly revenue)
+        ↓
+DBT run --> Executes all in dependency order
+        ↓
+DBT test --> Tests data quality
+        ↓
+Final: analytics.customer_monthly_sales (Table in Spark)
 ```
 
 ---
 
-## ✅ Expected Output
+## 🧠 Final Notes
 
-📄 Table: `analytics.customer_monthly_sales`
+- Every SQL model is **linked via ref()** to the previous stage.
+- DBT ensures models run in the **correct dependency order**.
+- Spark executes the heavy lifting — DBT organizes, tests, and tracks logic.
+
+---
+
+## ✅ Output Example
 
 | customer_id | month     | total_sales |
 |-------------|-----------|-------------|
-| 1           | 2024-01-01| 2300.00      |
-| 2           | 2024-01-01| 1800.00      |
-| 3           | 2024-02-01| 1500.00      |
-
----
-
-## 🧠 Explanation
-
-### 🔄 Why Incremental?
-
-- Large datasets can’t be recomputed each time.
-- `is_incremental()` ensures only new data is processed.
-
-### 🎯 Why DBT with Spark?
-
-| Feature           | Benefit                               |
-|------------------|----------------------------------------|
-| Modularity        | Break SQL into reusable components     |
-| Version Control   | Track transformations via Git          |
-| Testing           | Assure quality with built-in tests     |
-| Scheduling        | Works with Airflow/cron/dbt Cloud      |
-| Scalability       | Leverages Spark’s distributed power    |
-
----
-
-## 🧰 Bonus Tips
-
-- Use `{{ this }}` → refers to current model in Spark
-- Use Jinja logic to write dynamic SQL
-- Schedule runs using Airflow or Dagster
-- Materialize as `table`, `view`, or `incremental`
-
+| 1           | 2024-01   | 2000        |
+| 2           | 2024-02   | 1500        |
 
