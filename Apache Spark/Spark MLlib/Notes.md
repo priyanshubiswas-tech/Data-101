@@ -1,207 +1,204 @@
-# 🔍 Spark SQL & Query Optimization
+# 🤖 Apache Spark MLlib (Machine Learning Library)
 
 ---
 
-## 📌 What is Spark SQL?
+## 📌 What is MLlib?
 
-> **Spark SQL** is a module for structured data processing using SQL queries, DataFrames, and Datasets. It provides a distributed SQL engine that supports ANSI SQL syntax.
+> **MLlib** is Apache Spark’s scalable machine learning library for performing ML on distributed data using **DataFrames** and **Pipelines**.
 
-### 💡 Why Use It?
-- Express complex logic using familiar **SQL**
-- Optimized query execution with **Catalyst** & **Tungsten**
-- Unified access to data from multiple sources (Hive, Parquet, JDBC, Kafka, etc.)
+### ✅ Why Use MLlib?
+
+- Scalable: Works on distributed clusters
+- High-level APIs in **Python, Java, Scala**
+- Seamlessly integrated with Spark SQL & DataFrames
+- Ready-to-use ML algorithms: Classification, Regression, Clustering, Recommendation
 
 ---
 
-## 🧱 Spark SQL Architecture
+## 🧱 MLlib Architecture
 
 ```
-         📥 Data Sources (CSV, Parquet, Hive, JDBC, Kafka)
-                          ↓
-               🔄 Spark Catalyst Optimizer
-                          ↓
-             Logical Plan → Optimized Plan → Physical Plan
-                          ↓
-                 🔧 Tungsten Execution Engine
-                          ↓
-                    🧪 Output (DataFrame/Result)
+        🔄 Input Data (Structured DataFrame)
+                     ↓
+       🔍 Feature Extraction / Transformation
+                     ↓
+        🏗️ Pipeline (Stages of processing)
+                     ↓
+           📊 Model Training & Evaluation
+                     ↓
+               ✅ Predictions
 ```
 
 ---
 
-## 🧰 Common Syntax
+## 🧠 MLlib Components
 
-### 📄 Read Data as DataFrame
+| Category           | Examples                                              |
+|--------------------|-------------------------------------------------------|
+| **Algorithms**      | Logistic Regression, Decision Trees, KMeans           |
+| **Feature Transformers** | StringIndexer, VectorAssembler, MinMaxScaler   |
+| **Pipelines**       | Combine stages into repeatable flows                 |
+| **Evaluators**      | Accuracy, RMSE, F1 Score                              |
+| **Persistence**     | Save/load models and pipelines                       |
+
+---
+
+## ⚙️ Core Steps in MLlib
+
+```
+1️⃣ Load Data
+2️⃣ Clean & Transform Features
+3️⃣ Split into Train/Test
+4️⃣ Build a Pipeline
+5️⃣ Fit the Model
+6️⃣ Evaluate & Predict
+```
+
+---
+
+## 💻 PySpark MLlib Classification Example
+
+### 🧪 Logistic Regression on a Titanic-style Dataset
 
 ```python
-# CSV
-df = spark.read.csv("file.csv", header=True, inferSchema=True)
+from pyspark.sql import SparkSession
+from pyspark.ml.classification import LogisticRegression
+from pyspark.ml.feature import VectorAssembler, StringIndexer
+from pyspark.ml import Pipeline
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
 
-# Parquet
-df = spark.read.parquet("file.parquet")
+spark = SparkSession.builder.appName("MLExample").getOrCreate()
 
-# Hive Table
-df = spark.sql("SELECT * FROM my_table")
+# Load data
+df = spark.read.csv("titanic.csv", header=True, inferSchema=True)
+
+# Feature Engineering
+indexer = StringIndexer(inputCol="Sex", outputCol="SexIndex")
+assembler = VectorAssembler(inputCols=["Pclass", "Age", "SexIndex"], outputCol="features")
+
+# Model
+lr = LogisticRegression(featuresCol="features", labelCol="Survived")
+
+# Pipeline
+pipeline = Pipeline(stages=[indexer, assembler, lr])
+
+# Split
+train, test = df.randomSplit([0.7, 0.3], seed=42)
+
+# Train
+model = pipeline.fit(train)
+
+# Predict
+predictions = model.transform(test)
+
+# Evaluate
+evaluator = BinaryClassificationEvaluator(labelCol="Survived")
+print("AUC:", evaluator.evaluate(predictions))
 ```
 
-### 🧪 Run SQL Queries
+---
+
+## 🔄 Common Transformers
+
+| Transformer         | Purpose                          |
+|---------------------|----------------------------------|
+| `StringIndexer`     | Categorical → Numeric             |
+| `OneHotEncoder`     | One-hot encode categorical       |
+| `VectorAssembler`   | Combine features into vector     |
+| `StandardScaler`    | Normalize features               |
+| `MinMaxScaler`      | Scale between 0 and 1            |
+
+---
+
+## 🧠 Algorithms in MLlib
+
+| Type         | Algorithm Examples                        |
+|--------------|-------------------------------------------|
+| Classification | Logistic Regression, Random Forest      |
+| Regression     | Linear Regression, GBTRegressor         |
+| Clustering     | KMeans                                   |
+| Recommendation | ALS (Matrix Factorization)              |
+| NLP             | Tokenizer, StopWordsRemover             |
+
+---
+
+## 📈 Evaluation Metrics
+
+| Task           | Evaluator Class                       | Metric Name       |
+|----------------|----------------------------------------|-------------------|
+| Classification | `BinaryClassificationEvaluator`        | "areaUnderROC"    |
+| Regression     | `RegressionEvaluator`                  | "rmse", "r2"      |
+| Clustering     | Manual Silhouette Score (custom)       | N/A               |
+
+---
+
+## 🧪 Linear Regression Example
 
 ```python
-df.createOrReplaceTempView("people")
+from pyspark.ml.regression import LinearRegression
 
-result = spark.sql("""
-    SELECT name, AVG(age) as avg_age
-    FROM people
-    WHERE city = 'Delhi'
-    GROUP BY name
-""")
-
-result.show()
+lr = LinearRegression(featuresCol="features", labelCol="price")
+model = lr.fit(train_data)
+predictions = model.transform(test_data)
 ```
 
 ---
 
-## 📘 Spark SQL Functions
+## 🧱 Pipeline Structure
 
-| Category     | Functions                               |
-|--------------|------------------------------------------|
-| **String**   | `concat`, `substr`, `lower`, `upper`     |
-| **Date/Time**| `current_date()`, `datediff()`, `month()`|
-| **Agg**      | `count`, `avg`, `sum`, `min`, `max`      |
-| **Window**   | `row_number()`, `rank()`, `dense_rank()` |
+```
+[Raw Data] 
+   ↓
+[StringIndexer] → [VectorAssembler] → [Model Estimator]
+   ↓
+[Trained Model + Predictions]
+```
 
----
-
-## ⚡ Performance Optimization Techniques
-
-| Tip                                 | Benefit                                              |
-|-------------------------------------|------------------------------------------------------|
-| ✅ **Pushdown Filters**             | Reduces data read from disk                          |
-| ✅ **Predicate Pushdown** (Parquet) | Filters early, less I/O                              |
-| 🧠 **Broadcast Join**               | Avoids expensive shuffle when one table is small     |
-| 📦 **Caching**                      | Stores intermediate data in memory                   |
-| 🧼 **Partition Pruning**            | Skips reading unneeded partitions                    |
-| 🧪 **Use Parquet/ORC**              | Columnar formats, faster for Spark                   |
-| ⛓️ **Avoid UDFs**                  | Harder to optimize, use built-in functions instead   |
-| 🎯 **Repartition smartly**          | Avoid skewed shuffles and too many small files       |
-| 🔁 **Use Explain Plan**             | Analyze query plan with `.explain(True)`             |
-
----
-
-## 🧠 Catalyst Optimizer (Spark's Brain)
-
-> Catalyst is Spark’s extensible **query optimization engine**.
-
-### Steps:
-1. **Parse SQL** → Logical Plan
-2. **Analyze** → Resolve attributes/types
-3. **Optimize** → Constant folding, predicate pushdown, etc.
-4. **Physical Plan** → Code generation
-
----
-
-## 🔍 EXPLAIN Query Plan
+### Sample Pipeline Build
 
 ```python
-result.explain(True)
+from pyspark.ml import Pipeline
+pipeline = Pipeline(stages=[indexer, assembler, lr])
+model = pipeline.fit(train)
 ```
-
-> Shows the full query execution plan — helps you understand how Spark executes your logic.
 
 ---
 
-## 💾 Caching & Persistence
+## 💾 Save and Load Models
 
 ```python
-df.cache()        # Stores in memory
-df.persist()      # Use MEMORY_AND_DISK, etc.
-df.unpersist()
-```
+# Save
+model.write().overwrite().save("logistic_model")
 
-> Great for iterative algorithms, reused DataFrames.
-
----
-
-## 🧠 Broadcast Join
-
-```python
-from pyspark.sql.functions import broadcast
-
-# Small table should be broadcasted
-result = df1.join(broadcast(df2), "id")
-```
-
-✅ Use when one table is small → avoids shuffle → much faster
-
----
-
-## 🔄 Partitioning Tips
-
-```python
-# Partitioned read
-df = spark.read.option("basePath", "/data") \
-     .parquet("/data/year=2024/month=05/")
-
-# Repartition before large join
-df = df.repartition("id")
+# Load
+from pyspark.ml.pipeline import PipelineModel
+model = PipelineModel.load("logistic_model")
 ```
 
 ---
 
-## 🧪 Window Functions Example
-
-```python
-from pyspark.sql.window import Window
-from pyspark.sql.functions import row_number
-
-w = Window.partitionBy("dept").orderBy("salary")
-
-df.withColumn("rank", row_number().over(w)).show()
-```
-
----
-
-## 📊 Real-world SQL Flow with Spark
+## 🚀 Real-world MLlib Flow Example
 
 ```
-1️⃣ Source: Hive / Kafka / Parquet
-           ↓
-2️⃣ Read into DataFrame (spark.read)
-           ↓
-3️⃣ Transform via SQL (views + spark.sql)
-           ↓
-4️⃣ Optimize (broadcast, cache, explain)
-           ↓
-5️⃣ Sink: Save to DW / Output to Dashboard
+🧾 Input: Customer Data (CSV / Hive / Parquet)
+     ⬇️
+🧹 Clean & Transform (StringIndexer, VectorAssembler)
+     ⬇️
+🤖 Train Model (e.g., Random Forest)
+     ⬇️
+📈 Evaluate (ROC, Accuracy)
+     ⬇️
+📤 Save Model or Predict New Data
 ```
-
----
-
-## 🔧 Useful Configurations
-
-```python
-spark.conf.set("spark.sql.shuffle.partitions", 200)
-spark.conf.set("spark.sql.autoBroadcastJoinThreshold", 10*1024*1024)  # 10MB
-```
-
----
-
-## 🚀 Best Practices
-
-| Best Practice                     | Why                                                   |
-|----------------------------------|--------------------------------------------------------|
-| Use `.explain(True)`             | Debug performance                                      |
-| Reuse SparkSession               | Avoid overhead                                         |
-| Avoid shuffling unnecessarily    | Reduces time/memory usage                              |
-| Always cache reused DFs          | Speeds up iterative queries                            |
-| Avoid complex UDFs               | Catalyst can't optimize them                           |
 
 ---
 
 ## ✅ Summary
 
-- Spark SQL = Powerful SQL engine + Catalyst Optimizer
-- Write SQL-like logic on distributed DataFrames
-- Combine with Hive, Kafka, JDBC, Parquet, etc.
-- Optimize with broadcast, caching, repartition, explain plans
+- **Spark MLlib** = Scalable ML for Big Data
+- Use **DataFrames + Pipeline API**
+- Supports many common algorithms
+- Optimized for distributed training
+- Save & reuse models in production
+
 
