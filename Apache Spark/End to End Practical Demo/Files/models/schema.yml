@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: raw
+    tables:
+      - name: orders
+
+models:
+  - name: stg_orders
+    columns:
+      - name: order_id
+        tests:
+          - not_null
+          - unique
+  - name: customer_monthly_sales
+    columns:
+      - name: total_sales
+        tests:
+          - not_null
