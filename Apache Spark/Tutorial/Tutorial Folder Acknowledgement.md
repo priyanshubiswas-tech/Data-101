@@ -1,6 +1,6 @@
 # Tutorial Folder Acknowledgement
 
-The files in this `Tutorial` folder are prepared based on content provided by **GeekCoders** on YouTube:  
+The files in this `Tutorial` folder are prepared based on content provided by **rehandominic** and **GeekCoders** on YouTube:  
 🔗 [GeekCoders YouTube Channel](https://www.youtube.com/@GeekCoders)
 
 ## Original Playlists by GeekCoders
