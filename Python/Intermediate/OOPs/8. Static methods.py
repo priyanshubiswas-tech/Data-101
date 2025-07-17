@@ -21,5 +21,5 @@ s1.get_avg()
 s1.hello()
 
 
-#decorator allow us to wrap another function in orer to extend the behaviour -
+#decorator allow us to wrap another function in order to extend the behaviour -
 # - of the wrapped function,without permanently modifying it.
