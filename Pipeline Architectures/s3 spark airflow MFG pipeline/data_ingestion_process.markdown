@@ -21,6 +21,7 @@ This document outlines a step-by-step process for ingesting real-time data from 
 - **Implementation**:
   - Deploy Kafka on AWS MSK (Managed Streaming for Apache Kafka) or a self-managed cluster on Kubernetes.
   - Configure store systems to authenticate and send data to the MSK endpoint (e.g., `b-1.kafka-cluster.msk.amazonaws.com:9092`).
+  - When retail stores send data to Kafka, they establish secure network connections using TCP protocol with SSL/TLS encryption and authenticate using SASL mechanisms. This ensures data integrity, confidentiality, and proper access control.
 
 ### Step 2: Deploy Kafka on Kubernetes
 - **Objective**: Ensure the Kafka cluster is scalable and resilient using Kubernetes.
