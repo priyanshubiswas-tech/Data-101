@@ -160,8 +160,6 @@ Guarantees data security, compliance, and reliability across the entire ecosyste
 
 ## Summary Flow
 
-## Summary Flow
-
 - Data Sources
 - Data Ingestion
 - Raw Storage (Data Lake)
